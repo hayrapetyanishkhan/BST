@@ -8,44 +8,68 @@ class BST
 {
     struct TreeNode
     {
+        //Constructors
+        TreeNode() = default;
+        TreeNode(T value);
+        TreeNode(const TreeNode& rhs);
+        TreeNode(TreeNode&& rhs);
+
+        //Assignment Operators
+        TreeNode& operator=(const TreeNode& rhs);
+        TreeNode& operator=(TreeNode&& rhs);
+
+        //Destructor
+        ~TreeNode();
+        
+        //Data members
         TreeNode* left{};
         TreeNode* right{};
         T val;
-        TreeNode(T value) : val{value} {}
-        ~TreeNode()
-        {
-            delete left;
-            delete right;
-        }
     };
 public:
-    BST() {}
+    BST() = default;
+    BST(const BST& rhs);
+    BST(BST&& rhs);
+
+    BST& operator=(const BST& rhs);
+    BST& operator=(BST&& rhs);
+
+    ~BST();
+
     void insert(T value);
     void IterativeInsert(T value);
+    
     bool search(T value);
     bool IterativeSearch(T val);
+
     void erase(T value);
 
-    void IterativePre();
+    void IterativePreOrder();
+    void IterativeInOrder();
+    void IterativePostOrder();
+
     void PreOrderTraverse();
     void InOrderTraverse();
     void PostOrderTraverse();
-    int Height(); // the height of the root node
+
+    int Height();
+private:
     TreeNode* getMin(TreeNode* node);
     TreeNode* getMax(TreeNode* node);
+
     TreeNode* getSuccessor(TreeNode* node);
     TreeNode* getPredecessor(TreeNode* node);
-
-    ~BST() { delete root; }
-
-    //called on the BST object for a specific node
-    void PreOrder(TreeNode* node); // start traversing from the node
+private:
+    void PreOrder(TreeNode* node);
     void InOrder(TreeNode* node);
     void PostOrder(TreeNode* node);
-    int getHeight(TreeNode* node); // height of the node
+
+    int getHeight(TreeNode* node);
 private:
     TreeNode* insertHelper(TreeNode* node,T value);
+
     bool searchHelper(TreeNode* node,T value);
+
     TreeNode* eraseHelper(TreeNode* node,T value);
 private:
     TreeNode* root{};

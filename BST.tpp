@@ -1,48 +1,150 @@
 #include "BST.hpp"
 
 template<typename T>
-void BST<T>::PreOrderTraverse()
+BST<T>::TreeNode::TreeNode(T value) : val{value} {}
+
+template<typename T>
+BST<T>::TreeNode::TreeNode(const TreeNode& rhs)
 {
-    PreOrder(root);
+    val = rhs.val;
+    left = rhs.left ? new TreeNode(*rhs.left) : nullptr;
+    right = rhs.right ? new TreeNode(*rhs.right) : nullptr;
 }
 
 template<typename T>
-void BST<T>::PreOrder(TreeNode* node)
+BST<T>::TreeNode::TreeNode(TreeNode&& rhs)
 {
-    if(!node) return;
-    std::cout << node->val << " ";
-    PreOrder(node->left);
-    PreOrder(node->right);
+    val = std::move(rhs.val);
+    left = std::exchange(rhs.left,nullptr);
+    right = std::exchange(rhs.right,nullptr);
 }
 
 template<typename T>
-void BST<T>::InOrderTraverse()
+typename BST<T>::TreeNode& BST<T>::TreeNode::operator=(const TreeNode& rhs)
 {
-    InOrder(root);
+    if(this == &rhs)
+    {
+        return *this;
+    }
+    val = rhs.val;
+    delete left;
+    delete right;
+    left = rhs.left ? new TreeNode(*rhs.left) : nullptr;
+    right = rhs.right ? new TreeNode(*rhs.right) : nullptr;
+    return *this;
 }
 
 template<typename T>
-void BST<T>::InOrder(TreeNode* node)
+typename BST<T>::TreeNode& BST<T>::TreeNode::operator=(TreeNode&& rhs)
 {
-    if(!node) return;
-    InOrder(node->left);
-    std::cout << node->val << " ";
-    InOrder(node->right);
+    if(this == &rhs)
+    {
+        return *this;
+    }
+    val = std::move(rhs.val);
+    delete left;
+    delete right;
+    left = std::exchange(rhs.left,nullptr);
+    right = std::exchange(rhs.right,nullptr);
+    return *this;
 }
 
 template<typename T>
-void BST<T>::PostOrderTraverse()
+BST<T>::TreeNode::~TreeNode()
 {
-    PostOrder(root);
+    delete left;
+    delete right;
 }
 
 template<typename T>
-void BST<T>::PostOrder(TreeNode* node)
+BST<T>::BST(const BST& rhs)
 {
-    if(!node) return;
-    PostOrder(node->left);
-    PostOrder(node->right);
-    std::cout << node->val << " ";
+    root = rhs.root ? new TreeNode(*rhs.root) : nullptr;
+}
+
+template<typename T>
+BST<T>::BST(BST&& rhs)
+{
+    root = std::exchange(rhs.root,nullptr);
+}
+
+template<typename T>
+BST<T>& BST<T>::operator=(const BST& rhs)
+{
+    if(this == &rhs)
+    {
+        return *this;
+    }
+    delete root;
+    root = rhs.root ? new TreeNode(*rhs.root) : nullptr;
+    return *this;
+}
+
+template<typename T>
+BST<T>& BST<T>::operator=(BST&& rhs)
+{
+    if(this == &rhs)
+    {
+        return *this;
+    }
+    delete root;
+    root = std::exchange(rhs.root,nullptr);
+    return *this;
+}
+
+template<typename T>
+BST<T>::~BST()
+{
+    delete root;
+}
+
+template<typename T>
+void BST<T>::insert(T value)
+{
+    root = insertHelper(root,value);
+}
+
+template<typename T>
+typename BST<T>::TreeNode* BST<T>::insertHelper(TreeNode* node,T value)
+{
+    if(!node) return new TreeNode(value);
+    if(node->val > value) 
+    {
+        node->left =  insertHelper(node->left,value);
+    }
+    else if(node->val < value)
+    {
+        node->right =  insertHelper(node->right,value);
+    }
+    return node;
+}
+
+template<typename T>
+void BST<T>::IterativeInsert(T value)
+{
+    if(!root) 
+    {
+        root = new TreeNode(value);
+        return;
+    }
+    TreeNode* current = root;
+    TreeNode* parent{};
+    while(current)
+    {
+        parent = current;
+        if(current->val > value) current = current->left;
+        else if(current->val < value) current = current->right;
+        else return;
+    }
+    TreeNode* node = new TreeNode(value);
+    if(parent->val > value)
+    {
+        parent->left = node;
+    }
+    else
+    {
+        parent->right = node;
+    }
 }
 
 template<typename T>
@@ -83,77 +185,13 @@ bool BST<T>::IterativeSearch(T value)
 }
 
 template<typename T>
-int BST<T>::Height()
-{
-    return getHeight(root);
-}
-
-template<typename T>
-int BST<T>::getHeight(TreeNode* node)
-{
-    if(!node) return 0;
-    int left = getHeight(node->left);
-    int right = getHeight(node->right);
-    return std::max(left,right) + 1;
-}
-
-template<typename T>
-void BST<T>::insert(T value)
-{
-    root = insertHelper(root,value);
-}
-
-template<typename T>
-BST<T>::TreeNode* BST<T>::insertHelper(TreeNode* node,T value)
-{
-    if(!node) return new TreeNode(value);
-    if(node->val > value) 
-    {
-        node->left =  insertHelper(node->left,value);
-    }
-    else if(node->val < value)
-    {
-        node->right =  insertHelper(node->right,value);
-    }
-    return node;
-}
-
-template<typename T>
-void BST<T>::IterativeInsert(T value)
-{
-    if(!root) 
-    {
-        root = new TreeNode(value);
-        return;
-    }
-    TreeNode* Root = root;
-    TreeNode* parent = nullptr;
-    while(Root)
-    {
-        parent = Root;
-        if(Root->val > value) Root = Root->left;
-        else if(Root->val < value) Root = Root->right;
-        else return;
-    }
-    TreeNode* obj = new TreeNode(value);
-    if(parent->val > value)
-    {
-        parent->left = obj;
-    }
-    else
-    {
-        parent->right = obj;
-    }
-}
-
-template<typename T>
 void BST<T>::erase(T value)
 {
     root = eraseHelper(root,value);
 }
 
 template<typename T>
-BST<T>::TreeNode* BST<T>::eraseHelper(TreeNode* node,T value)
+typename BST<T>::TreeNode* BST<T>::eraseHelper(TreeNode* node,T value)
 {
     if(!node) return node;
     if(node->val > value)
@@ -192,7 +230,121 @@ BST<T>::TreeNode* BST<T>::eraseHelper(TreeNode* node,T value)
 }
 
 template<typename T>
-BST<T>::TreeNode* BST<T>::getMin(TreeNode* node)
+void BST<T>::IterativePreOrder()
+{
+    if(!root) return;
+    std::stack<TreeNode*> stack;
+    stack.push(root);
+    while(!stack.empty())
+    {
+        TreeNode* node = stack.top();
+        stack.pop();
+        std::cout << node->val << " ";
+        if(node->right)
+        {
+            stack.push(node->right);
+        }
+        if(node->left)
+        {
+            stack.push(node->left);
+        }
+    } 
+}
+
+template<typename T>
+void BST<T>::IterativeInOrder()
+{
+    if(!root) return;
+    std::stack<TreeNode*> stack;
+    TreeNode* current = root;
+    while(!stack.empty() || current)
+    {
+        while(current)
+        {
+            stack.push(current);
+            current = current->left;
+        }
+        current = stack.top(); stack.pop();
+        std::cout << current->val << " ";
+        current = current->right;
+    }
+}
+
+template<typename T>
+void BST<T>::IterativePostOrder()
+{
+    if(!root) return;
+    std::stack<TreeNode*> s1,s2;
+    s1.push(root);
+    while(!s1.empty())
+    {
+        TreeNode* node = s1.top(); 
+        s1.pop();
+        s2.push(node);
+        if(node->left) s1.push(node->left);
+        if(node->right) s1.push(node->right);
+    }
+    while(!s2.empty())
+    {
+        std::cout << s2.top()->val << " ";
+        s2.pop();
+    }
+
+    //Solution 2
+    // if(!root) return;
+    // stack<TreeNode*> st;
+    // TreeNode* current = root;
+    // TreeNode* lastVisited{};
+    // while(!st.empty() || current) 
+    // {
+    //     if(current) 
+    //     {
+    //         st.push(current);
+    //         current = current->left;
+    //     } 
+    //     else 
+    //     {
+    //         TreeNode* topNode = st.top();
+    //         if(topNode->right && lastVisited != topNode->right) 
+    //         {
+    //             current = topNode->right;
+    //         } 
+    //         else 
+    //         {
+    //             std::cout << topNode->val << " ";
+    //             lastVisited = topNode;
+    //             st.pop();
+    //         }
+    //     }
+    // }
+}
+
+template<typename T>
+void BST<T>::PreOrderTraverse()
+{
+    PreOrder(root);
+}
+
+template<typename T>
+void BST<T>::InOrderTraverse()
+{
+    InOrder(root);
+}
+
+template<typename T>
+void BST<T>::PostOrderTraverse()
+{
+    PostOrder(root);
+}
+
+template<typename T>
+int BST<T>::Height()
+{
+    return getHeight(root);
+}
+
+template<typename T>
+typename BST<T>::TreeNode* BST<T>::getMin(TreeNode* node)
 {
     if(!node) return node;
     while(node->left)
@@ -203,7 +355,7 @@ BST<T>::TreeNode* BST<T>::getMin(TreeNode* node)
 }
 
 template<typename T>
-BST<T>::TreeNode* BST<T>::getMax(TreeNode* node)
+typename BST<T>::TreeNode* BST<T>::getMax(TreeNode* node)
 {
     if(!node) return node;
     while(node->right)
@@ -214,72 +366,20 @@ BST<T>::TreeNode* BST<T>::getMax(TreeNode* node)
 }
 
 template<typename T>
-void BST<T>::IterativePre()
-{
-    if(!root) return;
-    std::stack<TreeNode*> stack;
-    stack.push(root);
-    while(!stack.empty())
-    {
-        TreeNode* tmp = stack.top();
-        stack.pop();
-        std::cout << tmp->val << " ";
-        if(tmp->right)
-        {
-            stack.push(tmp->right);
-        }
-        if(tmp->left)
-        {
-            stack.push(tmp->left);
-        }
-    } 
-}
-
-template<typename T>
-BST<T>::TreeNode* BST<T>::getPredecessor(TreeNode* node)
-{
-    if(!node) return node;
-    if(node->left)
-    {
-        return getMax(node->left);
-    }
-    TreeNode* ancestor{};
-    TreeNode* current = root;
-    while(current)
-    {
-        if(current->val > node->val)
-        {
-            ancestor = current;
-            current = current->left;
-        }
-        else if(current->val < node->val)
-        {
-            ancestor = current;
-            current = current->right;
-        }
-        else
-        {
-            return ancestor;
-        }
-    }
-    return nullptr;
-}
-
-template<typename T>
-BST<T>::TreeNode* BST<T>::getSuccessor(TreeNode* node)
+typename BST<T>::TreeNode* BST<T>::getSuccessor(TreeNode* node)
 {
     if(!node) return node;
     if(node->right)
     {
         return getMin(node->right);
     }
-    TreeNode* ancestor{};
+    TreeNode* successor{};
     TreeNode* current = root;
     while(current)
     {
         if(current->val > node->val)
         {
-            ancestor = current;
+            successor = current;
             current = current->left;
         }
         else if(current->val < node->val)
@@ -288,8 +388,73 @@ BST<T>::TreeNode* BST<T>::getSuccessor(TreeNode* node)
         }
         else
         {
-            return ancestor;
+            return successor;
         }
     }
     return nullptr;
+}
+
+template<typename T>
+typename BST<T>::TreeNode* BST<T>::getPredecessor(TreeNode* node)
+{
+    if(!node) return node;
+    if(node->left)
+    {
+        return getMax(node->left);
+    }
+    TreeNode* predecessor{};
+    TreeNode* current = root;
+    while(current)
+    {
+        if(current->val > node->val)
+        {
+            current = current->left;
+        }
+        else if(current->val < node->val)
+        {
+            predecessor = current;
+            current = current->right;
+        }
+        else
+        {
+            return predecessor;
+        }
+    }
+    return nullptr;
+}
+
+template<typename T>
+void BST<T>::PreOrder(TreeNode* node)
+{
+    if(!node) return;
+    std::cout << node->val << " ";
+    PreOrder(node->left);
+    PreOrder(node->right);
+}
+
+template<typename T>
+void BST<T>::InOrder(TreeNode* node)
+{
+    if(!node) return;
+    InOrder(node->left);
+    std::cout << node->val << " ";
+    InOrder(node->right);
+}
+
+template<typename T>
+void BST<T>::PostOrder(TreeNode* node)
+{
+    if(!node) return;
+    PostOrder(node->left);
+    PostOrder(node->right);
+    std::cout << node->val << " ";
+}
+
+template<typename T>
+int BST<T>::getHeight(TreeNode* node)
+{
+    if(!node) return 0;
+    int left = getHeight(node->left);
+    int right = getHeight(node->right);
+    return std::max(left,right) + 1;
 }

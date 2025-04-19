@@ -3,61 +3,59 @@
 int main() {
     BST<int> tree;
 
-    std::cout << "Empty tree tests:\n";
-    std::cout << "Search 10: " << tree.search(10) << "\n";
-    std::cout << "Height: " << tree.Height() << "\n";
-    tree.erase(10);
+    tree.insert(10);
+    tree.insert(5);
+    tree.insert(15);
+    tree.insert(3);
+    tree.insert(7);
+    tree.insert(12);
+    tree.insert(18);
 
-    tree.insert(50);
-    tree.insert(30);
-    tree.insert(70);
-    tree.insert(20);
-    tree.insert(40);
-    tree.insert(60);
-    tree.insert(80);
-
-    std::cout << "\nTraversal tests:\n";
     std::cout << "InOrder: ";
     tree.InOrderTraverse();
-    std::cout << "\nPreOrder: ";
+    std::cout << std::endl;
+
+    std::cout << "PreOrder: ";
     tree.PreOrderTraverse();
-    std::cout << "\nPostOrder: ";
+    std::cout << std::endl;
+
+    std::cout << "PostOrder: ";
     tree.PostOrderTraverse();
-    std::cout << "\nIterativePre: ";
-    tree.IterativePre();
-    std::cout << "\nHeight: " << tree.Height() << "\n";
+    std::cout << std::endl;
 
-    std::cout << "\nSearch tests:\n";
-    std::cout << "Search 30: " << tree.search(30) << "\n";
-    std::cout << "IterativeSearch 30: " << tree.IterativeSearch(30) << "\n";
-    std::cout << "Search 99: " << tree.search(99) << "\n";
+    std::cout << "Iterative InOrder: ";
+    tree.IterativeInOrder();
+    std::cout << std::endl;
 
-    std::cout << "\nDeletion tests:\n";
-    tree.erase(20);
-    std::cout << "After deleting 20: ";
+    std::cout << "Iterative PreOrder: ";
+    tree.IterativePreOrder();
+    std::cout << std::endl;
+
+    std::cout << "Iterative PostOrder: ";
+    tree.IterativePostOrder();
+    std::cout << std::endl;
+
+    std::cout << "Searching for 7: " << (tree.search(7) ? "Found" : "Not Found") << std::endl;
+    std::cout << "Searching for 20: " << (tree.search(20) ? "Found" : "Not Found") << std::endl;
+
+    tree.erase(7);
+    std::cout << "After Erasing 7, InOrder: ";
     tree.InOrderTraverse();
-    tree.erase(70);
-    std::cout << "\nAfter deleting 70: ";
-    tree.InOrderTraverse();
-    tree.erase(50);
-    std::cout << "\nAfter deleting 50: ";
-    tree.InOrderTraverse();
-    std::cout << "\nHeight after deletions: " << tree.Height() << "\n";
+    std::cout << std::endl;
 
-    BST<int> tree2;
-    tree2.insert(50);
-    tree2.insert(30);
-    tree2.insert(70);
-    tree2.insert(20);
-    tree2.insert(40);
-    tree2.insert(60);
-    tree2.insert(80);
+    tree.erase(10);
+    std::cout << "After Erasing 10, InOrder: ";
+    tree.InOrderTraverse();
+    std::cout << std::endl;
 
-    std::cout << "\nDuplicate insertion test:\n";
-    tree2.insert(50);
-    std::cout << "After duplicate insert: ";
-    tree2.InOrderTraverse();
-    std::cout << "\n";
+    std::cout << "Tree Height: " << tree.Height() << std::endl;
+
+    BST<int> treeCopy(tree);
+    std::cout << "Copy Tree InOrder: ";
+    treeCopy.InOrderTraverse();
+    std::cout << std::endl;
+
+    std::cout << "Searching for 12 in copied tree: " << (treeCopy.search(12) ? "Found" : "Not Found") << std::endl;
 
     return 0;
 }
